@@ -32,13 +32,27 @@ static void map_apply_elems_internal(struct map_node *node, void (*function)(voi
 
 struct map_node *map_insert_internal(struct map_node *node, const char *key, void *value, int *result)
 {
-
- /* YOU SHOULD DELETE THE CONTENTS OF THIS FUNCTION AND REPLACE IT WITH
-  * YOUR ANSWER TO PART 2, QUESTION 1.
-  */
-
-  fprintf(stderr, "map_insert_internal() unimplemented.\n");
-  return NULL;
+  if (node==NULL){
+    map_destroy_node(node);
+    struct map_node *newNode = map_alloc_node();
+    newNode->key = clone(key);
+    newNode->value = value;
+    newNode->left = NULL;
+    newNode->right = NULL;
+    result = (int *) 1;
+    return node;
+  }
+  int comparison = strcmp(node->key, key);
+  if(comparison ==0){
+    fprintf(stderr, "no new key inserted");
+  }
+  else if(comparison>0) {
+    node->right = map_insert_internal(node->right,key, value, result);
+  }
+  else if (comparison<0){
+    node->left = map_insert_internal(node->left, key, value, result);
+  }
+  return node;
 }
 
 
@@ -46,9 +60,18 @@ struct map_node *map_insert_internal(struct map_node *node, const char *key, voi
 
 void map_apply_elems(struct map *m, void (*function)(void *))
 {
- /* YOU SHOULD DELETE THE CONTENTS OF THIS FUNCTION AND REPLACE IT WITH
-  * YOUR ANSWER TO PART 3, QUESTION 1.
-  */
+  assert(m != NULL);
+  map_apply_elems_internal(m->root, (*function));
+}
+
+
+/*helper method to free memory allocated within each node of map */
+void map_apply_elems_internal(struct map_node *node, void (*function)(void *)){
+  if(node != NULL){
+    map_apply_elems_internal(node->right, (*function));
+    map_apply_elems_internal(node->left, (*function));
+    function(node->value);
+  }
 }
 
 
