@@ -11,27 +11,29 @@
 
 char *empty_string(void)
 {
-
- /* YOU SHOULD DELETE THE CONTENTS OF THIS FUNCTION AND REPLACE IT WITH
-  * YOUR ANSWER TO PART I, QUESTION 1.
-  */
-
-  fprintf(stderr, "empty_string() unimplemented.\n");
-  exit(EXIT_FAILURE);
+  char *string = malloc(sizeof(char));
+  if (string==NULL) {
+    perror("char pointer not allocated memory");
+    exit(EXIT_FAILURE);
+  }
+  *string = '\0';
+  return string;
 }
 
 
 /* Given a string, return a heap-allocated copy */
 
-char *clone(const char *str)
-{
+char *clone(const char *str){
+  assert(str != NULL);
 
- /* YOU SHOULD DELETE THE CONTENTS OF THIS FUNCTION AND REPLACE IT WITH
-  * YOUR ANSWER TO PART I, QUESTION 2.
-  */
-
-  fprintf(stderr, "clone() unimplemented.\n");
-  exit(EXIT_FAILURE);
+  size_t str_length = (strlen(str) +1)* sizeof(char);
+  char *string_copy = malloc(str_length);
+  if(string_copy ==NULL){
+    perror("clone");
+    exit(EXIT_FAILURE);
+  }
+  memcpy(string_copy, str, str_length);
+  return string_copy;
 }
 
 
@@ -40,15 +42,21 @@ char *clone(const char *str)
  * being leaked via some other mechanism.
  */
 
-char *push_string(char *current, const char *append)
-{
+char *push_string(char *current, const char *append) {
+  assert(current !=NULL);
+  assert(current !=NULL);
 
- /* YOU SHOULD DELETE THE CONTENTS OF THIS FUNCTION AND REPLACE IT WITH
-  * YOUR ANSWER TO PART I, QUESTION 3.
-  */
-
-  fprintf(stderr, "push_string() unimplemented.\n");
-  exit(EXIT_FAILURE);
+  size_t current_length = strlen(current) * sizeof(char);
+  size_t append_length = (strlen(append)+1)*sizeof(char);
+  size_t return_length = current_length + append_length;
+  current = realloc(current, return_length);
+  if (current == NULL){
+      perror("push_string");
+      exit(EXIT_FAILURE);
+  }
+  strcat(current, append);
+  
+  return current;
 }
 
 

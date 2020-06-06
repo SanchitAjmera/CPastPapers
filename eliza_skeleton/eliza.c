@@ -184,6 +184,7 @@ static void interactive_loop(struct eliza_state *eliza)
 
 int main(void)
 {
+  /*
   struct eliza_state eliza;
   eliza_init(&eliza);
   const int result = parse_eliza_script(&eliza, "./script");
@@ -194,5 +195,16 @@ int main(void)
   interactive_loop(&eliza);
   eliza_destroy(&eliza);
 
+  return EXIT_SUCCESS;
+  */
+  char *str;
+  str = empty_string();
+  str = push_string(str, "This ");
+  printf("%s\n",str);    
+  str = push_string(str, "is ");
+  str = push_string(str, "a sequence of ");
+  str = push_string(str, "string concatenations!");
+  printf("%s\n", str);
+  free(str);
   return EXIT_SUCCESS;
 }
