@@ -120,6 +120,12 @@ void huffman_tree_list_free(huffman_tree_list_t *l) {
  * Returns 1 if the string s contains the character c and 0 if it does not.
  */
 int contains(char *s, char c) {
+  assert(s != NULL);
+  for(int i = 0 ; i < strlen(s); i++){
+    if(s[i] == c){
+      return 1;
+    }
+  }
   return 0;
 }
 
@@ -127,7 +133,14 @@ int contains(char *s, char c) {
  * Returns the number of occurrences of c in s.
  */
 int frequency(char *s, char c) {
-  return 0;
+  assert(s!=NULL);
+  int frequency = 0;
+  for(int i =0; i< strlen(s); i++){
+    if (s[i] == c){
+      frequency++;
+    }
+  }
+  return frequency;
 }
 
 /*
@@ -138,7 +151,16 @@ int frequency(char *s, char c) {
  *      characters.
  */
 char *nub(char *s) {
-  return NULL;
+  char *unique_letters = malloc((MAX_STRING_LENGTH -1) * sizeof(char));
+  for(int i = 0; i < strlen(s); i++){
+    // checks if letter is already within unique letters
+    // in which case it isn't unqiue and isnt appended
+    if(!contains(unique_letters,s[i])){
+      unique_letters[strlen(unique_letters)] = s[i];
+    }
+  }
+  return unique_letters;
+  
 }
 
 /*
@@ -152,8 +174,34 @@ char *nub(char *s) {
  */
 huffman_tree_list_t *huffman_tree_list_add(huffman_tree_list_t *l,
                                             huffman_tree_t *t) {
-
-  return NULL;
+  //is pre condition is met then the list is already ordered (ascending)
+  // check if at the end of the list
+  if (l == NULL){
+    huffman_tree_list_t *new_list = malloc(sizeof(huffman_tree_list_t));
+    if(new_list ==NULL){
+      perror("no memory allocated to new list");
+      exit(EXIT_SUCCESS);
+    }
+    new_list->tree = t;
+    new_list->next = NULL;
+    return new_list;
+  }
+  //checking whether to insert before
+  else if(l->tree->count > t->count){
+    huffman_tree_list_t *new_list = malloc(sizeof(huffman_tree_list_t));
+    if(new_list ==NULL){
+      perror("no memory allocated to new list");
+      exit(EXIT_FAILURE);
+    }
+    new_list->tree = t;
+    new_list->next = l;
+    return new_list;
+  }
+  // tree to be inserted after
+  else{
+    l->next = huffman_tree_list_add(l->next, t);
+    return l;
+  } 
 }
 
 /*
@@ -167,7 +215,32 @@ huffman_tree_list_t *huffman_tree_list_add(huffman_tree_list_t *l,
  *        trees it contains.
  */
 huffman_tree_list_t *huffman_tree_list_build(char *s, char *t) {
-  return NULL;
+  // checking if anymore leaf nodes to add to list:
+  if (t == NULL){
+    return NULL;
+  }
+  
+  huffman_tree_list_t *list= malloc(sizeof(huffman_tree_list_t));
+  if (list ==NULL){
+    perror("no memory allocated to initial list");
+    exit(EXIT_FAILURE);
+  }
+
+  for(int i = 0; i <strlen(t); i++){
+    char current_letter = t[i];
+    huffman_tree_t *tree = malloc(sizeof(huffman_tree_t));
+    if(tree== NULL){
+      perror("no memory allocated to leaf node");
+      exit(EXIT_FAILURE);
+    }
+    tree->count = frequency(s, current_letter);
+    tree->letter= current_letter;
+    tree->right = NULL;
+    tree->left  = NULL;
+    huffman_tree_list_add(list, tree);
+  }
+
+  return list;
 }
 
 /*
@@ -179,7 +252,25 @@ huffman_tree_list_t *huffman_tree_list_build(char *s, char *t) {
  * Post:  The resuling list contains a single, correctly-formed Huffman tree.
  */
 huffman_tree_list_t *huffman_tree_list_reduce(huffman_tree_list_t *l) {
-  return NULL;
+  if (l->next == NULL){
+    return l;
+  }
+  huffman_tree_t *first = l->tree;
+  huffman_tree_t *second = l->next->tree;
+  huffman_tree_t *new_tree = malloc(sizeof(huffman_tree_t));
+  if (new_tree == NULL){
+    perror("memory not allocated to list");
+    exit(EXIT_FAILURE);
+  }
+  new_tree->count = first->count + second->count;
+  new_tree->left = first;
+  new_tree->right = second;
+  free(l->next->tree);
+  huffman_tree_list_t *place_holder = l->next->next;
+  free(l->next->next);
+  l->next = place_holder;
+  huffman_tree_list_add(l, new_tree);
+  return huffman_tree_list_reduce(l);
 }
 
 /*

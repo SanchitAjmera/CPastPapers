@@ -1,0 +1,72 @@
+#include "binaryheap.h"
+#include <assert.h>
+#include <string.h>
+
+
+node_heap *allocate_node_heap(void){
+  node_heap *node = calloc(1, sizeof(node));
+  return node;
+}
+
+void intial_heap(node_heap **heap, char* sequence){
+  assert(sequence != NULL);
+
+  assert(heap != NULL);
+  
+  int sequence_length = (int) strlen(sequence);
+  
+  for(int i = 0; i < sequence_length; i++){
+    node_heap *node = allocate_node_heap();
+    heap[i] = node;
+    node->key = sequence;
+    sequence++;
+    node->position  = i;
+  }
+}
+
+void print_elem_heap(node_heap **heap, int length){
+  assert(heap !=NULL);
+  
+  for(int i = 0; i < length; i++){
+    node_heap *node = heap[i];
+    printf("%s ", node->key);
+  }
+
+  printf("\n");
+
+  for(int i = 0; i < length; i++){
+    node_heap *node = heap[i];
+    printf("%d ", node->position);
+  }
+
+  printf("\n");
+}
+
+int parent(int index){
+  if(index == 1 || index <= 0){
+    perror("no parent of root or invalid index given");
+    exit(EXIT_FAILURE);
+  }
+  return index/2;
+}
+
+int left_child(int index){
+  if (index < 1){
+    perror("invalid index given"){
+      
+    }
+  }
+}
+
+
+
+
+
+
+
+
+int main(int argc, char **argv){
+    
+ //TO DO
+ return EXIT_SUCCESS;
+}
