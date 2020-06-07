@@ -85,36 +85,28 @@ void max_heapify(node_heap **heap, int current, int heap_size){
   if (current < 1){
     perror("invalid current position");
     exit(EXIT_FAILURE);
-  }  
-  
-  node_heap *parent = heap[current];
-  
-  if( heap_size < left_child(current)){
+  }
+
+  if(left_child(current) > heap_size ){
     return;
   }
- 
-  node_heap *left_child_node = heap[left_child(current)];
   
-  if( heap_size < right_child(current)){
-    //only has left child so only one comparision needed
-    int comparison = strcmp(parent->key, left_child_node->key);
-    if(comparison < 0 ){
-      swap(parent, left_child_node);
-    } else{
-      return;
+  node_heap *parent = heap[current];
+  node_heap *left_child_node = heap[left_child(current)];
+  node_heap *right_child_node = heap[right_child(current)];
+  int child_comparison = strcmp(right_child_node->key, left_child_node->key);
+  if(child_comparison < 0) {
+    int comparison = strcmp(left_child_node->key, parent->key);
+    if(comparison > 0){
+      swap(left_child_node, parent);
     }
-  }
-  else {
-    node_heap *right_child_node = heap[right_child(current)];
-    int comparison_children = strcmp(right_child_node->key, left_child_node->key);
-    node_heap *largest_node;
-    (comparison_children < 0) ? largest_node = left_child_node : right_child_node;
-    int comparison = strcmp(largest_node->key, parent->key);
-    if(comparison <= 0) {
-      return;
+    max_heapify(heap, parent->position, heap_size);
+  } else {
+    int comparison = strcmp(right_child_node->key, parent->key);
+    if(comparison > 0){
+      swap(right_child_node, parent);
     }
-    swap(largest_node, parent);
-    max_heapify(heap, largest_node->position, heap_size);
+    max_heapify(heap, parent->position, heap_size);
   }
 }
 
@@ -122,17 +114,16 @@ void max_heapify(node_heap **heap, int current, int heap_size){
 void build_max_heap(node_heap **heap, int heap_size){
   int last_parent_node =  heap_size/2;
   for(int i  = last_parent_node; i > 0; i--){
-    max_heapify(heap, i, 3);
+    max_heapify(heap, i, heap_size);
   }
 }
 
 void heapsort(node_heap **heap, int length){
-  int heap_size = length;
-  build_max_heap(heap, heap_size);
-  while(heap_size > 0){
-    swap(heap[1], heap[heap_size]);
-    heap_size--;
-    build_max_heap(heap, length);
+  assert(heap != NULL);
+  while(length > 1){
+    swap(heap[1], heap[length]);
+    length--;
+    max_heapify(heap, 1,  length);
   }
 }
 
