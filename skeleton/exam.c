@@ -174,6 +174,8 @@ char *nub(char *s) {
  */
 huffman_tree_list_t *huffman_tree_list_add(huffman_tree_list_t *l,
                                             huffman_tree_t *t) {
+
+  assert( t != NULL);
   //is pre condition is met then the list is already ordered (ascending)
   // check if at the end of the list
   if (l == NULL){
@@ -186,8 +188,12 @@ huffman_tree_list_t *huffman_tree_list_add(huffman_tree_list_t *l,
     new_list->next = NULL;
     return new_list;
   }
-  //checking whether to insert before
-  else if(l->tree->count > t->count){
+  // tree to be inserted after
+  else if(t->count > l->tree->count){
+    l->next = huffman_tree_list_add(l->next, t);
+    return l;
+  }
+  else {
     huffman_tree_list_t *new_list = malloc(sizeof(huffman_tree_list_t));
     if(new_list ==NULL){
       perror("no memory allocated to new list");
@@ -197,11 +203,6 @@ huffman_tree_list_t *huffman_tree_list_add(huffman_tree_list_t *l,
     new_list->next = l;
     return new_list;
   }
-  // tree to be inserted after
-  else{
-    l->next = huffman_tree_list_add(l->next, t);
-    return l;
-  } 
 }
 
 /*
@@ -216,15 +217,10 @@ huffman_tree_list_t *huffman_tree_list_add(huffman_tree_list_t *l,
  */
 huffman_tree_list_t *huffman_tree_list_build(char *s, char *t) {
   // checking if anymore leaf nodes to add to list:
-  if (t == NULL){
-    return NULL;
-  }
+  assert(s != NULL);
+  assert(t != NULL);
   
-  huffman_tree_list_t *list= malloc(sizeof(huffman_tree_list_t));
-  if (list ==NULL){
-    perror("no memory allocated to initial list");
-    exit(EXIT_FAILURE);
-  }
+  huffman_tree_list_t *list= NULL;
 
   for(int i = 0; i <strlen(t); i++){
     char current_letter = t[i];
@@ -237,9 +233,8 @@ huffman_tree_list_t *huffman_tree_list_build(char *s, char *t) {
     tree->letter= current_letter;
     tree->right = NULL;
     tree->left  = NULL;
-    huffman_tree_list_add(list, tree);
+    list = huffman_tree_list_add(list, tree);
   }
-
   return list;
 }
 
@@ -252,6 +247,7 @@ huffman_tree_list_t *huffman_tree_list_build(char *s, char *t) {
  * Post:  The resuling list contains a single, correctly-formed Huffman tree.
  */
 huffman_tree_list_t *huffman_tree_list_reduce(huffman_tree_list_t *l) {
+  assert(l != NULL);
   if (l->next == NULL){
     return l;
   }
@@ -265,12 +261,12 @@ huffman_tree_list_t *huffman_tree_list_reduce(huffman_tree_list_t *l) {
   new_tree->count = first->count + second->count;
   new_tree->left = first;
   new_tree->right = second;
-  free(l->next->tree);
-  huffman_tree_list_t *place_holder = l->next->next;
-  free(l->next->next);
-  l->next = place_holder;
-  huffman_tree_list_add(l, new_tree);
-  return huffman_tree_list_reduce(l);
+  huffman_tree_list_t *list = l->next->next;
+  list = huffman_tree_list_add(list, new_tree);
+  free(l->next);
+  free(l);
+  
+  return huffman_tree_list_reduce(list);
 }
 
 /*
